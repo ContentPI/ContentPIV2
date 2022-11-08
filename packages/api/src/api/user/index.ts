@@ -1,17 +1,15 @@
 import express, { Request, Response } from 'express'
+
 import knexConfig from '../../db/knexfile'
 
-type findAllParams = {
-  table: string
-  fields: any
-  where?: any
-  orWhere?: any
-}
+const db = require('knex')(knexConfig.development)
 
-const responseHandler = ({ data, operation = '', error, cache = false, status = null }: any) => {
+const router = express.Router()
+
+const responseHandler = ({ data, query = '', error, cache = false, status = null }: any) => {
   if (error) {
     return {
-      system: { cache, error: true, status: status || 500, operation },
+      system: { cache, error: true, status: status || 500, query },
       response: {
         error
       }
@@ -19,15 +17,15 @@ const responseHandler = ({ data, operation = '', error, cache = false, status = 
   }
 
   return {
-    system: { cache, error: false, status: status || 200, operation },
+    system: { cache, error: false, status: status || 200, query },
     response: {
       data
     }
   }
 }
 
-const orm: any = (db: any) => ({
-  async findAll({ table, fields, where = null, orWhere = null }: findAllParams) {
+const orm: any = (driver: any) => ({
+  async findAll({ table, fields, where = null, orWhere = null }: any) {
     if (!table) {
       throw new Error('Table name is required')
     }
@@ -39,29 +37,40 @@ const orm: any = (db: any) => ({
     let result = null
 
     if (where) {
-      result = await db(table).select(fields).where(where)
+      result = await driver(table).select(fields).where(where)
     }
 
     if (where && orWhere) {
-      result = await db(table).select(fields).where(where).orWhere(orWhere)
+      result = await driver(table).select(fields).where(where).orWhere(orWhere)
     }
 
     if (!where) {
-      result = await db(table).select(fields)
+      result = await driver(table).select(fields)
     }
 
     return result.length > 0 ? result : null
+  },
+  async insert({ table, data }: any) {
+    if (!table) {
+      throw new Error('Table name is required')
+    }
+
+    if (!data) {
+      throw new Error('Data is required')
+    }
+
+    const result = await driver(table).insert(data)
+
+    return result
   }
 })
 
-const knex = require('knex')(knexConfig.development)
-
-const router = express.Router()
-
 const get = {
   users: async (req: Request, res: Response) => {
+    const query = 'SELECT id, username, email, role, active FROM users'
+
     try {
-      const { data, sql } = await orm(knex).findAll({
+      const usersData = await orm(db).findAll({
         table: 'users',
         fields: {
           id: 'id',
@@ -72,11 +81,16 @@ const get = {
         }
       })
 
-      if (data.length > 0) {
-        res.json(responseHandler({ data, operation: 'SELECT * FROM users' }))
+      if (usersData) {
+        res.json(
+          responseHandler({
+            data: usersData,
+            query
+          })
+        )
       }
     } catch (error) {
-      res.json(responseHandler({ error, operation: 'GET_ALL_USERS' }))
+      res.json(responseHandler({ error, query }))
     }
   }
 }
@@ -84,10 +98,11 @@ const get = {
 router.get('/all', get.users)
 
 const post = {
-  create: async (req: Request, res: Response) => {
-    try {
-      const { username = '', password = '', email = '', role = '', active = false } = req.body
+  createUser: async (req: Request, res: Response) => {
+    const { username = '', password = '', email = '', role = '', active = false } = req.body
+    const query = `INSERT INTO users (username, password, email, role, active) VALUES (${username}, ?, ${password}, ${email}, ${role}, ${active})`
 
+    try {
       if (username === '' || password === '' || email === '' || role === '') {
         res.json(
           responseHandler({
@@ -97,12 +112,12 @@ const post = {
                 'Username, password, email and role are required. Please fill out all required fields.'
             },
             status: 400,
-            operation: 'createUser'
+            query
           })
         )
       }
 
-      const userData = await orm(knex).findAll({
+      const userData = await orm(db).findAll({
         table: 'users',
         fields: {
           id: 'id'
@@ -124,48 +139,42 @@ const post = {
                 'Username or email already exists. Please try again with a different username or email.'
             },
             status: 400,
-            operation: 'createUser'
+            query: `SELECT id FROM users WHERE username = ${username} OR email = ${email}`
           })
         )
-        res.json({
-          system: { cache: false, error: true, status: 400 },
-          response: {
-            error: {
-              details: '',
-              message: ''
-            }
-          }
-        })
       }
 
-      const user = await knex('users').insert({
-        username,
-        password,
-        email,
-        role,
-        active
+      const insertedUser = await orm(db).insert({
+        table: 'users',
+        data: {
+          username,
+          password,
+          email,
+          role,
+          active
+        }
       })
 
-      res.json({
-        system: { cache: false, error: false, status: 200 },
-        response: {
-          data: user
-        }
-      })
+      res.json(
+        responseHandler({
+          data: insertedUser,
+          query
+        })
+      )
     } catch (error) {
-      res.json({
-        system: { cache: false, error: true, status: 500 },
-        response: {
+      res.json(
+        responseHandler({
           error: {
-            details: error,
+            code: 'SERVER_ERROR',
             message: 'An error occurred, please try again later.'
-          }
-        }
-      })
+          },
+          query
+        })
+      )
     }
   }
 }
 
-router.post('/create', post.create)
+router.post('/create', post.createUser)
 
 export default router

@@ -10,6 +10,7 @@
     "mike-co.import-sorter",
     "zengxingxin.sort-js-object-keys",
     "diegolincoln.vscode-styled-components",
-    "jaspernorth.vscode-pigments"
+    "jaspernorth.vscode-pigments",
+    "rangav.vscode-thunder-client"
   ]
 }
