@@ -1,0 +1,36 @@
+{
+  "name": "@contentpi/api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "ts-node-dev src/index.ts",
+    "migrate": "cd src/db && knex migrate:latest",
+    "seed": "cd src/db && knex seed:run",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ContentPI/ContentPIV2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ContentPI/ContentPIV2/issues"
+  },
+  "homepage": "https://github.com/ContentPI/ContentPIV2#readme",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2",
+    "knex": "^2.3.0",
+    "pg": "^8.8.0",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.2",
+    "@types/express": "^4.17.14",
+    "@types/node": "^18.11.9",
+    "ts-node-dev": "^2.0.0"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.common.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "typeRoots": ["node_modules/@types", "src/@types"],
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  },
+  "files": ["src/@types/graphql.d.ts"],
+  "include": ["src/**/*"]
+}
