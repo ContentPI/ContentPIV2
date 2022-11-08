@@ -99,11 +99,23 @@ const post = {
         data: userToInsert
       })
 
-      userToInsert.password = '?'
+      const newUserData = await orm(db).findAll({
+        table: 'users',
+        fields: {
+          id: 'id',
+          username: 'username',
+          email: 'email',
+          role: 'role',
+          active: 'active'
+        },
+        where: {
+          email
+        }
+      })
 
       return res.json(
         responseHandler({
-          data: userToInsert,
+          data: newUserData[0],
           query
         })
       )
