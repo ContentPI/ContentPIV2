@@ -1,3 +1,4 @@
+import { orm, responseHandler, security } from '@contentpi/utils'
 import express, { Request, Response } from 'express'
 
 import knexConfig from '../../db/knexfile'
@@ -5,65 +6,6 @@ import knexConfig from '../../db/knexfile'
 const db = require('knex')(knexConfig.development)
 
 const router = express.Router()
-
-const responseHandler = ({ data, query = '', error, cache = false, status = null }: any) => {
-  if (error) {
-    return {
-      system: { cache, error: true, status: status || 500, query },
-      response: {
-        error
-      }
-    }
-  }
-
-  return {
-    system: { cache, error: false, status: status || 200, query },
-    response: {
-      data
-    }
-  }
-}
-
-const orm: any = (driver: any) => ({
-  async findAll({ table, fields, where = null, orWhere = null }: any) {
-    if (!table) {
-      throw new Error('Table name is required')
-    }
-
-    if (!fields) {
-      throw new Error('Fields are required')
-    }
-
-    let result = null
-
-    if (where) {
-      result = await driver(table).select(fields).where(where)
-    }
-
-    if (where && orWhere) {
-      result = await driver(table).select(fields).where(where).orWhere(orWhere)
-    }
-
-    if (!where) {
-      result = await driver(table).select(fields)
-    }
-
-    return result.length > 0 ? result : null
-  },
-  async insert({ table, data }: any) {
-    if (!table) {
-      throw new Error('Table name is required')
-    }
-
-    if (!data) {
-      throw new Error('Data is required')
-    }
-
-    const result = await driver(table).insert(data)
-
-    return result
-  }
-})
 
 const get = {
   users: async (req: Request, res: Response) => {
@@ -100,11 +42,11 @@ router.get('/all', get.users)
 const post = {
   createUser: async (req: Request, res: Response) => {
     const { username = '', password = '', email = '', role = '', active = false } = req.body
-    const query = `INSERT INTO users (username, password, email, role, active) VALUES (${username}, ?, ${password}, ${email}, ${role}, ${active})`
+    const query = `INSERT INTO users (username, password, email, role, active) VALUES (${username}, ?, ${email}, ${role}, ${active})`
 
     try {
       if (username === '' || password === '' || email === '' || role === '') {
-        res.json(
+        return res.json(
           responseHandler({
             error: {
               code: 'MISSING_FIELDS',
@@ -131,7 +73,7 @@ const post = {
       })
 
       if (userData) {
-        res.json(
+        return res.json(
           responseHandler({
             error: {
               code: 'USERNAME_OR_EMAIL_EXISTS',
@@ -144,25 +86,29 @@ const post = {
         )
       }
 
-      const insertedUser = await orm(db).insert({
+      const userToInsert = {
+        username,
+        password: security.encrypt(password),
+        email,
+        role,
+        active
+      }
+
+      await orm(db).insert({
         table: 'users',
-        data: {
-          username,
-          password,
-          email,
-          role,
-          active
-        }
+        data: userToInsert
       })
 
-      res.json(
+      userToInsert.password = '?'
+
+      return res.json(
         responseHandler({
-          data: insertedUser,
+          data: userToInsert,
           query
         })
       )
     } catch (error) {
-      res.json(
+      return res.json(
         responseHandler({
           error: {
             code: 'SERVER_ERROR',
