@@ -40,7 +40,7 @@ const get = {
 router.get('/', get.users)
 
 const post = {
-  createUser: async (req: Request, res: Response) => {
+  create: async (req: Request, res: Response) => {
     const { username = '', password = '', email = '', role = '', active = false } = req.body
     const query = `INSERT INTO users (username, password, email, role, active) VALUES (${username}, ?, ${email}, ${role}, ${active})`
 
@@ -94,7 +94,7 @@ const post = {
         active
       }
 
-      await orm(db).insert({
+      await orm(db).create({
         table: 'users',
         data: userToInsert
       })
@@ -133,6 +133,6 @@ const post = {
   }
 }
 
-router.post('/create', post.createUser)
+router.post('/create', post.create)
 
 export default router

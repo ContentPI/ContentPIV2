@@ -5,6 +5,7 @@ export async function up(knex: Knex): Promise<void> {
 
   return knex.schema.createTable('models', (table: any) => {
     table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'))
+    table.string('app', 100).notNullable()
     table.string('name', 100).notNullable()
     table.string('description', 255).notNullable()
     table.json('fields').notNullable()

@@ -6,6 +6,7 @@ import cors from 'cors'
 import express from 'express'
 import { applyMiddleware } from 'graphql-middleware'
 
+import modelsApi from './api/v1/models'
 import usersApi from './api/v1/users'
 import resolvers from './graphql/resolvers'
 import typeDefs from './graphql/types'
@@ -33,6 +34,7 @@ const schema = applyMiddleware(
 )
 
 // API
+app.use('/api/v1/models', modelsApi)
 app.use('/api/v1/users', usersApi)
 
 // Apollo Server

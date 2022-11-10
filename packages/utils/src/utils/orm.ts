@@ -24,7 +24,7 @@ const orm: any = (db: any) => ({
 
     return result.length > 0 ? result : null
   },
-  async insert({ table, data }: any) {
+  async create({ table, data }: any) {
     if (!table) {
       throw new Error('Table name is required')
     }
