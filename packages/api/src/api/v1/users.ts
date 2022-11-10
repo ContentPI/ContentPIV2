@@ -8,21 +8,6 @@ const db = require('knex')(knexConfig.development)
 const router = express.Router()
 
 const get = {
-  test: async (req: Request, res: Response) => {
-    const exists = await db.schema.hasTable('test')
-
-    if (!exists) {
-      await db.schema.createTable('test', (table: any) => {
-        table.uuid('id').primary().defaultTo(db.raw('uuid_generate_v4()'))
-        table.string('name')
-        table.string('email')
-      })
-
-      res.send('table created')
-    } else {
-      res.send('Table exists - Seeded data')
-    }
-  },
   users: async (req: Request, res: Response) => {
     const query = 'SELECT id, username, email, role, active FROM users'
 
@@ -52,8 +37,7 @@ const get = {
   }
 }
 
-router.get('/test', get.test)
-router.get('/all', get.users)
+router.get('/', get.users)
 
 const post = {
   createUser: async (req: Request, res: Response) => {

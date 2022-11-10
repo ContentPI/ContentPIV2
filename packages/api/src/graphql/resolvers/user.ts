@@ -2,7 +2,7 @@
 const getUsers = async (_: any, _args: any, { request }: { request: any }) => {
   const {
     response: { data, error }
-  } = await request('/api/user/all')
+  } = await request('/users')
 
   if (data.length > 0) {
     return {
@@ -23,7 +23,7 @@ const getUsers = async (_: any, _args: any, { request }: { request: any }) => {
 const createUser = async (_: any, { input }: { input: any }, { request }: { request: any }) => {
   const {
     response: { data, error }
-  } = await request('/api/user/create', {
+  } = await request('/users/create', {
     method: 'POST',
     body: JSON.stringify(input)
   })

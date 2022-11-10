@@ -6,7 +6,7 @@ import cors from 'cors'
 import express from 'express'
 import { applyMiddleware } from 'graphql-middleware'
 
-import userApi from './api/user'
+import usersApi from './api/v1/users'
 import resolvers from './graphql/resolvers'
 import typeDefs from './graphql/types'
 
@@ -33,24 +33,33 @@ const schema = applyMiddleware(
 )
 
 // API
-app.use('/api/user', userApi)
+app.use('/api/v1/users', usersApi)
 
 // Apollo Server
 const apolloServer = new ApolloServer({
   schema,
-  context: async () => ({
-    request: (endpoint: string, options = {}) => {
-      const requestOptions: any = {
-        ...options,
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-
-      return fetch(`http://localhost:4000${endpoint}`, requestOptions).then((res) => res.json())
+  context: async ({ req }) => {
+    const apiUrl = 'http://localhost:4000'
+    const apiVersions: Record<string, string> = {
+      v1: '/api/v1'
     }
-  })
+    const version = req.headers['api-version'] || 'v1'
+    const apiVersion: string = apiVersions[version as string] || apiVersions.v1
+
+    return {
+      request: (endpoint: string, options = {}) => {
+        const requestOptions: any = {
+          ...options,
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+
+        return fetch(`${apiUrl}${apiVersion}${endpoint}`, requestOptions).then((res) => res.json())
+      }
+    }
+  }
 })
 
 apolloServer.start().then(() => {
