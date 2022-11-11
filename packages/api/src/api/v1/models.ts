@@ -191,6 +191,35 @@ const put = {
           })
         )
       }
+      console.log('modelData===>>', modelData)
+
+      if (Object.keys(relationships).length > 0) {
+        const { tableA, type, tableB, fields: relationalFields } = relationships
+
+        const firstTable = `${app}_${tableA}`
+        const secondTable = `${app}_${tableB}`
+        const relationshipName = `${app}_${tableA}_${type}_${tableB}`
+
+        const tableAExists = await db.schema.hasTable(firstTable)
+        const tableBExists = await db.schema.hasTable(secondTable)
+        const relationTableExists = await db.schema.hasTable(relationshipName)
+
+        if (tableAExists && tableBExists && !relationTableExists) {
+          await db.schema.createTable(relationshipName, (t: any) => {
+            t.uuid('id').primary().defaultTo(db.raw('uuid_generate_v4()'))
+
+            relationalFields.forEach((field: any) => {
+              const { field: fieldName, references } = field
+
+              const tableInstance = t.uuid(fieldName)
+
+              if (references) {
+                tableInstance.references(`${app}_${references}`)
+              }
+            })
+          })
+        }
+      }
 
       const updatedModel = await orm(db).update({
         table: 'models',
@@ -212,6 +241,7 @@ const put = {
         })
       )
     } catch (error) {
+      console.log('ERROR===>>>', error)
       return res.json(responseHandler({ error, query }))
     }
   }
