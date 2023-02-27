@@ -9,6 +9,7 @@
     "lint:fix": "eslint --ext .tsx,.ts ./packages/**/src",
     "build": "npm-run-all build:*",
     "build:devtools": "cd ./packages/devtools && npm run build",
+    "build:i18n": "cd ./packages/i18n && npm run build",
     "build:utils": "cd ./packages/utils && npm run build",
     "authentication:webpack:development": "webpack --config=webpack.config.ts --env mode=development --env type=package --env packageName=authentication",
     "authentication:webpack:production": "webpack --config=webpack.config.ts --env mode=production --env type=package --env packageName=authentication",

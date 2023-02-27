@@ -6,8 +6,11 @@ import cors from 'cors'
 import express from 'express'
 import { applyMiddleware } from 'graphql-middleware'
 
+// APIs
 import modelsApi from './api/v1/models'
 import usersApi from './api/v1/users'
+
+// Graphql
 import resolvers from './graphql/resolvers'
 import typeDefs from './graphql/types'
 
@@ -56,6 +59,10 @@ const apolloServer = new ApolloServer({
           headers: {
             'Content-Type': 'application/json'
           }
+        }
+
+        if (requestOptions.body) {
+          requestOptions.body = JSON.stringify(requestOptions.body)
         }
 
         return fetch(`${apiUrl}${apiVersion}${endpoint}`, requestOptions).then((res) => res.json())

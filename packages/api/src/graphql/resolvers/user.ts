@@ -15,17 +15,19 @@ const getUsers = async (_: any, _args: any, { request }: { request: any }) => {
     __typename: 'Error',
     error
   }
-
-  return data
 }
 
 // Mutations
-const createUser = async (_: any, { input }: { input: any }, { request }: { request: any }) => {
+const createUser = async (
+  _: any,
+  { input: body }: { input: any },
+  { request }: { request: any }
+) => {
   const {
     response: { data, error }
   } = await request('/users/create', {
     method: 'POST',
-    body: JSON.stringify(input)
+    body
   })
 
   if (data) {
@@ -39,8 +41,6 @@ const createUser = async (_: any, { input }: { input: any }, { request }: { requ
     __typename: 'Error',
     error
   }
-
-  return data
 }
 
 export default {
