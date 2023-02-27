@@ -5,8 +5,8 @@ export async function up(knex: Knex): Promise<void> {
 
   return knex.schema.createTable('users', (table: any) => {
     table.uuid('id').primary().defaultTo(knex.raw('uuid_generate_v4()'))
-    table.string('username', 100).notNullable()
-    table.string('email', 255).notNullable()
+    table.string('username', 100).unique().notNullable()
+    table.string('email', 255).unique().notNullable()
     table.string('password', 40).notNullable()
     table.string('role', 10).notNullable()
     table.boolean('active').notNullable().defaultTo(false)

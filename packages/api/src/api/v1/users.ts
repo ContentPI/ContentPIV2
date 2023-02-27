@@ -61,7 +61,8 @@ router.get('/', get.users)
 const post = {
   create: async (req: Request, res: Response) => {
     const { username = '', password = '', email = '', role = '', active = false } = req.body
-    const query = `INSERT INTO users (username, password, email, role, active) VALUES (${username}, ?, ${email}, ${role}, ${active})`
+    const encryptedPassword = security.encrypt(password)
+    const query = `INSERT INTO users (username, password, email, role, active) VALUES ('${username}', '${encryptedPassword}', '${email}', '${role}', ${active})`
 
     try {
       if (username === '' || password === '' || email === '' || role === '') {
@@ -107,7 +108,7 @@ const post = {
 
       const userToInsert = {
         username,
-        password: security.encrypt(password),
+        password: encryptedPassword,
         email,
         role,
         active
