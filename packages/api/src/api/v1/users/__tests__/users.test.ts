@@ -1,7 +1,7 @@
 import { createTracker, MockClient } from 'knex-mock-client'
 import { getUsers, createUser } from '../users'
 import { db } from '../../../../db/knex'
-import { mockResponse } from './mockData'
+import { query, mockResponse, user } from './mockData'
 
 // Mocking the database
 jest.mock('../../../../db/knex', () => {
@@ -12,7 +12,7 @@ jest.mock('../../../../db/knex', () => {
   }
 })
 
-describe('User API', () => {
+describe('Users API', () => {
   let tracker: any
 
   beforeAll(() => {
@@ -26,11 +26,7 @@ describe('User API', () => {
   describe('GET Endpoints', () => {
     it('GET /api/v1/users - should get all users', async () => {
       // Setting up the tracker to return the response
-      tracker.on
-        .select(
-          'select "id" as "id", "username" as "username", "email" as "email", "role" as "role", "active" as "active" from "users"'
-        )
-        .response(mockResponse.getUsers.data.allUsers)
+      tracker.on.select(query.getUsers).response(mockResponse.getUsers.data.allUsers)
 
       const usersData = await getUsers()
 
@@ -40,93 +36,38 @@ describe('User API', () => {
 
   describe('POST Endpoints', () => {
     it('POST /api/v1/users/create - it should fail to create new user due to missing fields', async () => {
-      // Setting up the tracker to return the response
-      tracker.on.insert('users').response()
-
-      const newUser1 = {
-        username: '',
-        password: '12345678',
-        email: 'foo@bar.com',
-        role: 'god',
-        active: false
-      }
-
-      const newUserData1 = await createUser(newUser1)
+      const newUserData1 = await createUser(user.withNoUsername)
       expect(newUserData1.response).toEqual(mockResponse.createUser.error.missingFields)
 
-      const newUser2 = {
-        username: 'user4',
-        password: '',
-        email: 'foo@bar.com',
-        role: 'god',
-        active: false
-      }
-
-      const newUserData2 = await createUser(newUser2)
+      const newUserData2 = await createUser(user.withNoPassword)
       expect(newUserData2.response).toEqual(mockResponse.createUser.error.missingFields)
 
-      const newUser3 = {
-        username: 'user4',
-        password: '123445678',
-        email: '',
-        role: 'god',
-        active: false
-      }
-
-      const newUserData3 = await createUser(newUser3)
+      const newUserData3 = await createUser(user.withNoEmail)
       expect(newUserData3.response).toEqual(mockResponse.createUser.error.missingFields)
 
-      const newUser4 = {
-        username: 'user4',
-        password: '123445678',
-        email: 'foo@bar.com',
-        role: '',
-        active: false
-      }
-
-      const newUserData4 = await createUser(newUser4)
+      const newUserData4 = await createUser(user.withNoRole)
       expect(newUserData4.response).toEqual(mockResponse.createUser.error.missingFields)
     })
 
     it('POST /api/v1/users/create - it should fail to create new user due to existing username or email', async () => {
       // Setting up the tracker to return the response
       tracker.on
-        .select(`select "id" as "id" from "users" where "username" = ? or ("email" = ?)`)
+        .select(query.createUser.existingUser)
         .response(mockResponse.createUser.data.existingUser)
 
-      const existingUser = {
-        username: 'existinguser',
-        password: '12345678',
-        email: 'existinguser@foo.com',
-        role: 'god',
-        active: false
-      }
-
-      const newUserData1 = await createUser(existingUser)
+      const newUserData1 = await createUser(user.existingUser)
       expect(newUserData1.response).toEqual(mockResponse.createUser.error.usernameOrEmailExists)
     })
 
     it('POST /api/v1/users/create - it should create a new user', async () => {
       // Setting up the tracker to return the response
-      tracker.on
-        .select(`select "id" as "id" from "users" where "username" = ? or ("email" = ?)`)
-        .response(null)
+      tracker.on.select(query.createUser.existingUser).response(null)
       tracker.on.insert('users').response(mockResponse.createUser.data.createdUser)
       tracker.on
-        .select(
-          `select "id" as "id", "username" as "username", "email" as "email", "role" as "role", "active" as "active" from "users" where "email" = ?`
-        )
+        .select(query.createUser.insertedUser)
         .response(mockResponse.createUser.data.createdUser)
 
-      const existingUser = {
-        username: 'newuser',
-        password: '12345678',
-        email: 'newuser@foo.com',
-        role: 'god',
-        active: false
-      }
-
-      const newUserData = await createUser(existingUser)
+      const newUserData = await createUser(user.newUser)
 
       expect(newUserData.response.data).toEqual(mockResponse.createUser.data.createdUser[0])
     })
