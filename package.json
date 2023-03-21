@@ -5,7 +5,8 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "NODE_ENV=test jest --verbose --coverage",
+    "test": "NODE_ENV=test jest --verbose",
+    "test:coverage": "NODE_ENV=test jest --verbose --coverage",
     "lint": "eslint --ext .tsx,.ts ./packages/**/src",
     "lint:fix": "eslint --ext .tsx,.ts ./packages/**/src",
     "build": "npm-run-all build:*",
