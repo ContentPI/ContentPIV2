@@ -1,9 +1,6 @@
 import { orm, responseHandler } from '@contentpi/utils'
 import express, { Request, Response } from 'express'
-
-import knexConfig from '../../db/knexfile'
-
-const db = require('knex')(knexConfig.development)
+import { db } from '../../../db/knex'
 
 const router = express.Router()
 

@@ -79,3 +79,5 @@ apolloServer.start().then(() => {
     console.log('Running on http://localhost:4000')
   })
 })
+
+export default app

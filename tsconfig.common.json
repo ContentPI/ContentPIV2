@@ -25,5 +25,5 @@
     "suppressImplicitAnyIndexErrors": false,
     "target": "ESNext"
   },
-  "exclude": ["node_modules", "dist", "coverage", ".vscode", "**/__tests__/*"]
+  "exclude": ["node_modules", "dist", "coverage", ".vscode", "**/*.test.ts", "**/*.test.tsx"]
 }
