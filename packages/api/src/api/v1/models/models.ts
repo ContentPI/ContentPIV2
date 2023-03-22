@@ -1,6 +1,8 @@
 import { responseHandler } from '@contentpi/utils'
 import { db } from '../../../db/knex'
 
+const isTest = process.env.NODE_ENV === 'test'
+
 type Model = {
   app: string
   name: string
@@ -8,6 +10,9 @@ type Model = {
   fields: any
   relationships: any
   active: boolean
+  __test__?: {
+    hasTable?: boolean
+  }
 }
 
 export const createModel = async ({
@@ -16,7 +21,8 @@ export const createModel = async ({
   description = '',
   fields = [],
   relationships = [],
-  active = true
+  active = true,
+  __test__ = { hasTable: true }
 }: Model) => {
   const modelName = `${app}_${name}`
 
@@ -25,6 +31,7 @@ export const createModel = async ({
   )}, ${JSON.stringify(relationships)}, ${active})`
 
   try {
+    // Check if required fields are filled out
     if (app === '' || name === '' || fields.length === 0) {
       return responseHandler({
         error: {
@@ -36,6 +43,7 @@ export const createModel = async ({
       })
     }
 
+    // Check if model already exists
     const modelData = await db('models')
       .select({
         id: 'id',
@@ -60,8 +68,9 @@ export const createModel = async ({
       })
     }
 
-    const exists = await db.schema.hasTable(modelName)
+    const exists = isTest ? __test__?.hasTable : await db.schema.hasTable(modelName)
 
+    // Create table if it doesn't exist
     if (!exists) {
       await db.schema.createTable(modelName, (table: any) => {
         table.uuid('id').primary().defaultTo(db.raw('uuid_generate_v4()'))
@@ -98,6 +107,7 @@ export const createModel = async ({
       })
     }
 
+    // Create model
     const createdModel = await db('models').insert({
       app,
       name: modelName,

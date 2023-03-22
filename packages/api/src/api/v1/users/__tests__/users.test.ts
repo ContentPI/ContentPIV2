@@ -36,16 +36,16 @@ describe('Users API', () => {
 
   describe('POST Endpoints', () => {
     it('POST /api/v1/users/create - it should fail to create new user due to missing fields', async () => {
-      const newUserData1 = await createUser(user.withNoUsername)
+      const newUserData1 = await createUser(user.withoutUsername)
       expect(newUserData1.response).toEqual(mockResponse.createUser.error.missingFields)
 
-      const newUserData2 = await createUser(user.withNoPassword)
+      const newUserData2 = await createUser(user.withoutPassword)
       expect(newUserData2.response).toEqual(mockResponse.createUser.error.missingFields)
 
-      const newUserData3 = await createUser(user.withNoEmail)
+      const newUserData3 = await createUser(user.withoutEmail)
       expect(newUserData3.response).toEqual(mockResponse.createUser.error.missingFields)
 
-      const newUserData4 = await createUser(user.withNoRole)
+      const newUserData4 = await createUser(user.withoutRole)
       expect(newUserData4.response).toEqual(mockResponse.createUser.error.missingFields)
     })
 

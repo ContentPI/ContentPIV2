@@ -1,7 +1,7 @@
 import { createTracker, MockClient } from 'knex-mock-client'
 import { createModel, updateModel } from '../models'
 import { db } from '../../../../db/knex'
-import { mockResponse } from './mockData'
+import { mockResponse, model, query } from './mockData'
 
 // Mocking the database
 jest.mock('../../../../db/knex', () => {
@@ -25,63 +25,37 @@ describe('Models API', () => {
 
   describe('POST Endpoints', () => {
     it('POST /api/v1/models/create - it should fail to create new model due to missing fields', async () => {
-      const newModel1 = {
-        app: '',
-        name: 'post',
-        description: 'Blog Post table',
-        fields: [
-          {
-            field: 'title',
-            type: 'string',
-            notNullable: true
-          },
-          {
-            field: 'slug',
-            type: 'string',
-            notNullable: true
-          }
-        ],
-        relationships: [],
-        active: true
-      }
-
-      const newModelData1 = await createModel(newModel1)
+      const newModelData1 = await createModel(model.withoutApp)
       expect(newModelData1.response).toEqual(mockResponse.createModel.error.missingFields)
 
-      const newModel2 = {
-        app: 'blog',
-        name: '',
-        description: 'Blog Post table',
-        fields: [
-          {
-            field: 'title',
-            type: 'string',
-            notNullable: true
-          },
-          {
-            field: 'slug',
-            type: 'string',
-            notNullable: true
-          }
-        ],
-        relationships: [],
-        active: true
-      }
-
-      const newModelData2 = await createModel(newModel2)
+      const newModelData2 = await createModel(model.withoutName)
       expect(newModelData2.response).toEqual(mockResponse.createModel.error.missingFields)
 
-      const newModel3 = {
-        app: 'blog',
-        name: 'post',
-        description: 'Blog Post table',
-        fields: [],
-        relationships: [],
-        active: true
-      }
-
-      const newModelData3 = await createModel(newModel3)
+      const newModelData3 = await createModel(model.withoutFields)
       expect(newModelData3.response).toEqual(mockResponse.createModel.error.missingFields)
+    })
+
+    it('POST /api/v1/models/create - it should fail to create new model due to existing model', async () => {
+      // Setting up the tracker to return the response
+      tracker.on
+        .select(query.createModel.existingModel)
+        .response(mockResponse.createModel.data.existingModel)
+      tracker.on.insert('models').response(mockResponse.createModel.data.createdModel)
+
+      const newModelData = await createModel(model.newModel)
+
+      expect(newModelData.response).toEqual(
+        mockResponse.createModel.error.modelExists(model.newModel.app)
+      )
+    })
+
+    it('POST /api/v1/models/create - it should create a new model', async () => {
+      // Setting up the tracker to return the response
+      tracker.on.select(query.createModel.existingModel).response(null)
+      tracker.on.insert('models').response(mockResponse.createModel.data.createdModel)
+
+      const newModelData = await createModel({ ...model.newModel, __test__: { hasTable: true } })
+      expect(newModelData.response.data).toEqual(mockResponse.createModel.data.createdModel)
     })
   })
 })

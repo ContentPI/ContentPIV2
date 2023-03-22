@@ -7,19 +7,19 @@ const userData = {
 }
 
 export const user = {
-  withNoUsername: {
+  withoutUsername: {
     ...userData,
     username: ''
   },
-  withNoPassword: {
+  withoutPassword: {
     ...userData,
     password: ''
   },
-  withNoEmail: {
+  withoutEmail: {
     ...userData,
     email: ''
   },
-  withNoRole: {
+  withoutRole: {
     ...userData,
     role: ''
   },

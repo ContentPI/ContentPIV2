@@ -44,6 +44,7 @@ export const createUser = async ({
   const encryptedPassword = security.encrypt(password)
   const query = `INSERT INTO users (username, password, email, role, active) VALUES ('${username}', '${encryptedPassword}', '${email}', '${role}', ${active})`
 
+  // Check if required fields are filled out
   try {
     if (username === '' || password === '' || email === '' || role === '') {
       return responseHandler({
@@ -57,6 +58,7 @@ export const createUser = async ({
       })
     }
 
+    // Check if username or email already exists
     const userData = await db('users').select({ id: 'id' }).where({ username }).orWhere({ email })
 
     if (userData) {
@@ -71,6 +73,7 @@ export const createUser = async ({
       })
     }
 
+    // Create new user
     const userToInsert = {
       username,
       password: encryptedPassword,
