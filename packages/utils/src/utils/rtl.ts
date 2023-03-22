@@ -29,8 +29,6 @@ const parseLocale = (strLocale: string) => {
     return false
   }
 
-  // matches[2] = self._trim(matches[2], ['-', '_'])
-
   const lang = matches[1].toLowerCase()
   const countryCode = (matches[2] || '').toUpperCase()
 

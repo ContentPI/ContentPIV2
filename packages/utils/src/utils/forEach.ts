@@ -2,6 +2,10 @@ import is from './is'
 import keys from './keys'
 
 function forEach(items: any, callback: any): any {
+  if (is.String(items)) {
+    return false
+  }
+
   if (!is.Defined(items)) {
     return false
   }

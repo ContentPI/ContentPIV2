@@ -1,6 +1,6 @@
 import is from './is'
 
-function capitalize(str: string): string {
+function capitalize(str: any): string {
   if (!is.String(str)) {
     return ''
   }

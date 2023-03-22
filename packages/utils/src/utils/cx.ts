@@ -1,28 +1,61 @@
+import is from './is'
+
 type Attrs = {
   ccn: string
   data: string[]
   className?: string
 }
 
-const cx = {
-  join(...classes: string[]) {
-    return classes.join(' ').trim()
-  },
-  generate({ ccn, data, className }: Attrs) {
-    const classList = [ccn]
+export const cx = (...classes: any): string => {
+  const classArr = []
 
-    data.forEach((key) => {
-      if (key !== '') {
-        classList.push(`${ccn}-${key}`)
-      }
-    })
+  for (let i = 0; i < classes.length; i += 1) {
+    const arg: any = classes[i]
 
-    if (className) {
-      classList.push(className)
+    if (!arg) {
+      continue
     }
 
-    return classList.join(' ')
+    const type = typeof arg
+
+    if (type === 'string' || type === 'number') {
+      classArr.push(arg)
+    }
+
+    if (is.Array(arg)) {
+      classArr.push(...arg)
+    }
+
+    if (type === 'object') {
+      for (const key in arg) {
+        if (arg[key]) {
+          if (arg[key] === true) {
+            classArr.push(key)
+          }
+
+          if (is.String(arg[key]) && !classArr.includes(arg[key])) {
+            classArr.push(arg[key])
+          }
+        }
+      }
+    }
   }
+
+  return classArr.join(' ')
 }
 
-export default cx
+export const classGenerator = ({ ccn, data, className }: Attrs) => {
+  const classList = [ccn]
+
+  data.forEach((key) => {
+    if (key !== '') {
+      classList.push(`${ccn}-${key}`)
+    }
+  })
+
+  if (className) {
+    classList.push(className)
+  }
+
+  return classList.join(' ')
+}

@@ -1,7 +1,7 @@
 import is from './is'
 
 const base64 = {
-  get(value: string) {
+  get(value: any) {
     let buffer = ''
 
     if (is.String(value)) {
