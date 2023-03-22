@@ -71,5 +71,33 @@ export const mockResponse = {
         }
       ]
     }
+  },
+  updateModel: {
+    error: {
+      missingFields: {
+        error: {
+          code: 'MISSING_FIELDS',
+          message: 'App, name and fields are required. Please fill out all required fields.'
+        }
+      },
+      modelNotFound: (app: string) => ({
+        error: {
+          code: 'MODEL_NOT_FOUND',
+          message: `A model with this name does not exist in the '${app}' app.`
+        }
+      })
+    },
+    data: {
+      existingModel: {
+        ...modalData,
+        id: '8ea6ab47-8377-4e56-8a84-707c882b42c4'
+      },
+      updatedModel: [
+        {
+          ...modalData,
+          id: '8ea6ab47-8377-4e56-8a84-707c882b42c5'
+        }
+      ]
+    }
   }
 }

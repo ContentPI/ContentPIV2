@@ -135,11 +135,11 @@ export const updateModel = async (body: Model, params: any) => {
     fields
   )}, ${JSON.stringify(relationships)}, ${active})`
 
-  if (app === '' || name === '' || description === '' || fields.length === 0) {
+  if (app === '' || name === '' || fields.length === 0) {
     return responseHandler({
       error: {
         code: 'MISSING_FIELDS',
-        message: 'Name, description and fields are required. Please fill out all required fields.'
+        message: 'App, name and fields are required. Please fill out all required fields.'
       },
       status: 400,
       query

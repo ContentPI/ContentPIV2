@@ -58,4 +58,42 @@ describe('Models API', () => {
       expect(newModelData.response.data).toEqual(mockResponse.createModel.data.createdModel)
     })
   })
+
+  describe('PUT Endpoints', () => {
+    it('PUT /api/v1/models/update/:app/:modelName - it should fail to update a model due to missing fields', async () => {
+      const updatedModelData1 = await updateModel(model.withoutApp, { app: '', modelName: 'post' })
+      expect(updatedModelData1.response).toEqual(mockResponse.updateModel.error.missingFields)
+
+      const updatedModelData2 = await updateModel(model.withoutName, { app: 'blog', modelName: '' })
+      expect(updatedModelData2.response).toEqual(mockResponse.updateModel.error.missingFields)
+
+      const updatedModelData3 = await updateModel(model.withoutFields, {
+        app: 'blog',
+        modelName: 'post'
+      })
+      expect(updatedModelData3.response).toEqual(mockResponse.updateModel.error.missingFields)
+    })
+
+    it('PUT /api/v1/models/:app/:modelName  - it should fail to update a model that does not exists', async () => {
+      // Setting up the tracker to return the response
+      tracker.on.select(query.createModel.existingModel).response(null)
+
+      const updatedModelData = await updateModel(model.newModel, { app: 'blog', modelName: 'post' })
+
+      expect(updatedModelData.response).toEqual(
+        mockResponse.updateModel.error.modelNotFound(model.newModel.app)
+      )
+    })
+
+    it('PUT /api/v1/models/:app/:modelName  - it should update a model', async () => {
+      // Setting up the tracker to return the response
+      tracker.on
+        .select(query.createModel.existingModel)
+        .response(mockResponse.updateModel.data.existingModel)
+      tracker.on.update('models').response(mockResponse.updateModel.data.updatedModel)
+
+      const newModelData = await updateModel(model.newModel, { app: 'blog', modelName: 'post' })
+      expect(newModelData.response.data).toEqual(mockResponse.updateModel.data.updatedModel)
+    })
+  })
 })
