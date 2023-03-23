@@ -1,9 +1,10 @@
+import { describe, expect, it, vi } from 'vitest'
 import forEach from '../forEach'
 
 describe('forEach', () => {
   it('should iterate over array elements and execute the callback', () => {
     const mockArray = [1, 2, 3]
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
     forEach(mockArray, mockCallback)
 
     expect(mockCallback).toHaveBeenCalledTimes(3)
@@ -14,7 +15,7 @@ describe('forEach', () => {
 
   it('should iterate over object keys and execute the callback', () => {
     const mockObject = { a: 1, b: 2, c: 3 }
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
     forEach(mockObject, mockCallback)
 
     const objectKeys = Object.keys(mockObject)
@@ -25,7 +26,7 @@ describe('forEach', () => {
   })
 
   it('should return false if items are not defined', () => {
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
     const result = forEach(undefined, mockCallback)
 
     expect(mockCallback).not.toHaveBeenCalled()
@@ -33,7 +34,7 @@ describe('forEach', () => {
   })
 
   it('should return false if items are neither an array nor an object', () => {
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
     const result = forEach('string', mockCallback)
 
     expect(mockCallback).not.toHaveBeenCalled()

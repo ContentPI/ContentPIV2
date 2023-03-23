@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { getGraphQlError, fetchQuery } from '../graphql'
 
 describe('getGraphQlError', () => {
@@ -16,7 +17,7 @@ describe('getGraphQlError', () => {
 
 describe('fetchQuery', () => {
   const mockApolloClient = {
-    query: jest.fn()
+    query: vi.fn()
   }
 
   const mockQuery = 'test query'
@@ -53,6 +54,7 @@ describe('fetchQuery', () => {
       query: mockQuery,
       variables: mockVariables
     })
+
     expect(result).toEqual(mockData)
   })
 })

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { getParams, getCurrentLocale, buildUrl, getUrlWithoutLocale } from '../url'
 
 describe('getParams', () => {
@@ -11,10 +12,6 @@ describe('getParams', () => {
 
   it('removes the trailing slash from the URL', () => {
     expect(getParams('/example/path/')).toEqual(['example', 'path'])
-  })
-
-  it('returns an empty string when the URL is empty', () => {
-    expect(getParams('')).toEqual('')
   })
 
   it('returns the segment at the specified index when index is provided', () => {

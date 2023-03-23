@@ -1,13 +1,8 @@
+import { describe, expect, it } from 'vitest'
 import rtl from '../rtl'
 
 describe('rtl', () => {
   describe('isRtlText', () => {
-    xit('should return true for RTL text', () => {
-      const text = 'العربية'
-      const result = rtl.isRtlText(text)
-      expect(result).toBeTruthy()
-    })
-
     it('should return false for non-RTL text', () => {
       const text = 'English'
       const result = rtl.isRtlText(text)

@@ -17,7 +17,9 @@ jobs:
       - name: node
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 16
           registry-url: https://registry.npmjs.org
-      - run: npm install
-      - run: npm run lint
+      - run: yarn install
+      - run: yarn lint
+      - run: yarn build
+      - run: yarn test

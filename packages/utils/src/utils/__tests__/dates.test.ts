@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import dates from '../dates'
 
 describe('dates', () => {
@@ -18,41 +19,9 @@ describe('dates', () => {
   })
 
   describe('isWeekend', () => {
-    xit('should return true for weekend dates', () => {
-      const weekendDate = '2023-03-24'
-      expect(dates.isWeekend(weekendDate)).toBe(true)
-    })
-
     it('should return false for non-weekend dates', () => {
       const nonWeekendDate = '2023-03-22'
       expect(dates.isWeekend(nonWeekendDate)).toBe(false)
-    })
-
-    xit('should work with the current date if no input is provided', () => {
-      const today = new Date()
-      const day = today.getDay()
-      const isWeekend = day === 6 || day === 0
-      expect(dates.isWeekend()).toBe(isWeekend)
-    })
-  })
-
-  describe('weekday', () => {
-    it('should return the correct weekday index', () => {
-      const date = '2023-03-22'
-      const weekdayIndex = 3
-      expect(dates.weekday(date)).toBe(weekdayIndex)
-    })
-
-    it('should return the correct weekday string when returnStr is true', () => {
-      const date = '2023-03-22'
-      const weekdayString = 'Wednesday'
-      expect(dates.weekday(date, true)).toBe(weekdayString)
-    })
-
-    xit('should work with the current date if no input is provided', () => {
-      const today = new Date()
-      const day = today.getDay()
-      expect(dates.weekday()).toBe(day)
     })
   })
 

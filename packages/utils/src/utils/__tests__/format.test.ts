@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import format from '../format'
 import currencyFormatter from 'currency-formatter'
 
