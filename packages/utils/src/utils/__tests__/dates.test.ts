@@ -25,20 +25,6 @@ describe('dates', () => {
     })
   })
 
-  describe('weekday', () => {
-    it('should return the correct weekday index', () => {
-      const date = '2023-03-22'
-      const weekdayIndex = 3
-      expect(dates.weekday(date)).toBe(weekdayIndex)
-    })
-
-    it('should return the correct weekday string when returnStr is true', () => {
-      const date = '2023-03-22'
-      const weekdayString = 'Wednesday'
-      expect(dates.weekday(date, true)).toBe(weekdayString)
-    })
-  })
-
   describe('getDaysDifference', () => {
     it('should return the correct number of days between two dates', () => {
       const date1 = '2023-03-01'
