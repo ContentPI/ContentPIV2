@@ -1,10 +1,11 @@
+import { describe, expect, it, beforeAll, afterEach, vi } from 'vitest'
 import { createTracker, MockClient } from 'knex-mock-client'
 import { getUsers, createUser } from '../users'
 import { db } from '../../../../db/knex'
 import { query, mockResponse, user } from './mockData'
 
 // Mocking the database
-jest.mock('../../../../db/knex', () => {
+vi.mock('../../../../db/knex', () => {
   const knex = require('knex')
 
   return {

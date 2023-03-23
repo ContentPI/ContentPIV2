@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { cx, classGenerator } from '../cx'
 
 describe('cx', () => {

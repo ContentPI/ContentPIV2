@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { googleContactIdToUUID, uuidToGoogleContactId, isUUID } from '../uuid'
 
 describe('googleContactIdToUUID', () => {

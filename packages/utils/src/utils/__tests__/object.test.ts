@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { parseDebugData, merge } from '../object'
 
 describe('parseDebugData', () => {

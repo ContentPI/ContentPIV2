@@ -1,18 +1,7 @@
+import { describe, expect, it } from 'vitest'
 import { getEmptyValues, getReferenceTitle, getEntries, getValuesForTable } from '../values'
 
 describe('getEmptyValues', () => {
-  xit('should return empty object if no empty fields', () => {
-    const values = {
-      a: 1,
-      b: 'foo',
-      c: null,
-      d: '',
-      e: ' '
-    }
-    const result = getEmptyValues(values, ['a', 'b', 'c'])
-    expect(result).toEqual(false)
-  })
-
   it('should return object with empty fields', () => {
     const values = {
       a: 1,
@@ -61,93 +50,11 @@ describe('getReferenceTitle', () => {
     const result = getReferenceTitle(entry)
     expect(result).toEqual('Unknown')
   })
-
-  xit('should exclude specified system fields from result', () => {
-    const entry = {
-      id: 1,
-      createdAt: '2022-04-01',
-      updatedAt: '2022-04-02',
-      status: 'published',
-      modelName: 'post',
-      title: 'My Post'
-    }
-    const result = getReferenceTitle(entry, ['createdAt', 'updatedAt', 'status', 'modelName'])
-    expect(result).toEqual('My Post')
-  })
 })
 
 describe('getEntries', () => {
   it('returns null if data is null', () => {
     expect(getEntries(null)).toBeNull()
-  })
-
-  xit('returns null if fields are undefined', () => {
-    expect(getEntries({})).toBeNull()
-  })
-
-  xit('returns fields and values when fields are present', () => {
-    const data = {
-      fields: [
-        {
-          fieldName: 'Name',
-          identifier: 'name',
-          isSystem: false,
-          type: 'Text',
-          values: [
-            {
-              entry: 1,
-              value: 'John'
-            },
-            {
-              entry: 2,
-              value: 'Jane'
-            }
-          ]
-        },
-        {
-          fieldName: 'Created At',
-          identifier: 'createdAt',
-          isSystem: true,
-          type: 'Datetime'
-        }
-      ]
-    }
-
-    expect(getEntries(data)).toEqual({
-      head: ['Name'],
-      body: ['name'],
-      systemHead: ['Created At'],
-      systemBody: ['createdAt'],
-      entries: [{ name: 'John' }, { name: 'Jane' }]
-    })
-  })
-
-  xit('returns values when values are present and fields are undefined', () => {
-    const data = {
-      values: [
-        {
-          entry: 1,
-          name: 'John',
-          createdAt: '2022-03-22T00:00:00.000Z'
-        },
-        {
-          entry: 2,
-          name: 'Jane',
-          createdAt: '2022-03-21T00:00:00.000Z'
-        }
-      ]
-    }
-
-    expect(getEntries(data)).toEqual({
-      head: [],
-      body: ['name', 'createdAt'],
-      systemHead: [],
-      systemBody: [],
-      entries: [
-        { name: 'John', createdAt: '2022-03-22T00:00:00.000Z' },
-        { name: 'Jane', createdAt: '2022-03-21T00:00:00.000Z' }
-      ]
-    })
   })
 
   it('excludes updatedAt by default', () => {
