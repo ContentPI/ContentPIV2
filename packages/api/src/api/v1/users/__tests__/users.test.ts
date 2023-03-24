@@ -38,7 +38,19 @@ describe('Users API', () => {
   })
 
   describe('POST Endpoints', () => {
-    describe('POST /api/v1/users/validate', () => {})
+    describe('POST /api/v1/users/validate', () => {
+      it('it should fail to validate user due to missing accessToken', async () => {
+        const at = ''
+        const userData = await getUser(at)
+        expect(userData?.response.data).toEqual(mockResponse.getUser.error.userWithoutData(at))
+      })
+
+      it('it should fail to validate user due to invalid accessToken', async () => {
+        const at = 'invalidAccessToken'
+        const userData = await getUser(at)
+        expect(userData?.response.data).toEqual(mockResponse.getUser.error.userWithoutData(at))
+      })
+    })
 
     describe('POST /api/v1/users/create', () => {
       it('it should fail to create new user due to missing fields', async () => {

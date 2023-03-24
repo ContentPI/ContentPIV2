@@ -42,6 +42,20 @@ export const query = {
 }
 
 export const mockResponse = {
+  getUser: {
+    error: {
+      userWithoutData: (at: string) => ({
+        id: '',
+        username: '',
+        email: '',
+        role: '',
+        active: false,
+        _DEBUG: JSON.stringify({
+          hasCookie: Boolean(at)
+        })
+      })
+    }
+  },
   getUsers: {
     data: {
       allUsers: [
