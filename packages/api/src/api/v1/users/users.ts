@@ -1,5 +1,9 @@
-import { responseHandler, security } from '@contentpi/utils'
+import { responseHandler, security, is } from '@contentpi/utils'
+import { createToken, jwtVerify } from './jwt'
 import { db } from '../../../db/knex'
+
+export const secretKey = 'ContentPI'
+export const expiresIn = '30d'
 
 type User = {
   username: string
@@ -7,6 +11,135 @@ type User = {
   email: string
   role: string
   active: boolean
+}
+
+type Login = {
+  emailOrUsername: string
+  password: string
+}
+
+// Private methods
+export const getUserData = async (accessToken: any): Promise<any> => {
+  const UserPromise = new Promise((resolve) => jwtVerify(accessToken, (user: any) => resolve(user)))
+
+  const user = await UserPromise
+
+  return user
+}
+
+export const getUserBy = async (where: any, roles: string[]): Promise<any> => {
+  const [user] = await db('users')
+    .select({
+      id: 'id',
+      username: 'username',
+      password: 'password',
+      email: 'email',
+      role: 'role',
+      active: 'active'
+    })
+    .where(where)
+
+  if (user && roles.includes(user.role)) {
+    return user
+  }
+
+  return null
+}
+
+export const authenticate = async (emailOrUsername: string, password: string): Promise<any> => {
+  const where = is.Email(emailOrUsername)
+    ? { email: emailOrUsername }
+    : { username: emailOrUsername }
+
+  const query = `SELECT * FROM users WHERE ${
+    is.Email(emailOrUsername) ? 'email' : 'username'
+  } = ? AND password = ?`
+
+  const user = await getUserBy(where, ['god', 'admin', 'editor', 'user'])
+
+  if (!user) {
+    return responseHandler({
+      error: {
+        code: 'INVALID_LOGIN',
+        message: 'Invalid Login'
+      },
+      status: 403,
+      query
+    })
+  }
+
+  const passwordMatch = is.PasswordMatch(security.encrypt(password), user.password)
+  const isActive = user.active
+
+  if (!passwordMatch) {
+    return responseHandler({
+      error: {
+        code: 'INVALID_LOGIN',
+        message: 'Invalid Login'
+      },
+      status: 403,
+      query
+    })
+  }
+
+  if (!isActive) {
+    return responseHandler({
+      error: {
+        code: 'ACCOUNT_NOT_ACTIVATED',
+        message: 'Your account is not activated yet'
+      },
+      status: 403,
+      query
+    })
+  }
+
+  const [token] = await createToken(user)
+
+  return responseHandler({
+    data: {
+      token
+    },
+    query
+  })
+}
+
+// Public methods
+export const getUser = async (at: string) => {
+  const query = 'SELECT * FROM users WHERE emailOrUsername = ? AND password = ?'
+  const connectedUser = await getUserData(at)
+
+  if (connectedUser) {
+    // Validating if the user is still valid
+    const user = await getUserBy(
+      {
+        id: connectedUser.id,
+        email: connectedUser.email,
+        active: connectedUser.active
+      },
+      [connectedUser.role]
+    )
+
+    if (user) {
+      return responseHandler({
+        data: connectedUser,
+        query
+      })
+    }
+  }
+
+  return responseHandler({
+    data: {
+      id: '',
+      username: '',
+      email: '',
+      role: '',
+      active: false,
+      _DEBUG: JSON.stringify({
+        hasCookie: Boolean(at)
+      })
+    },
+    query
+  })
 }
 
 export const getUsers = async () => {
@@ -108,3 +241,6 @@ export const createUser = async ({
     })
   }
 }
+
+export const login = async ({ emailOrUsername = '', password = '' }: Login) =>
+  authenticate(emailOrUsername, password)
