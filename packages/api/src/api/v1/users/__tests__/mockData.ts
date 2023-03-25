@@ -83,6 +83,19 @@ export const mockResponse = {
       ]
     }
   },
+  validateUser: {
+    data: {
+      existingUser: {
+        id: '8ea6ab47-8377-4e56-8a84-707c882b42c4',
+        username: 'czantany',
+        email: 'azapedia@gmail.com',
+        active: true,
+        token:
+          'N2FkYWZiMzQ1ZWFkZGFmMjdkYjQzMjBhNzE3ZjBmNzg4OTYzNjdjYjdjMjIyZmIyOTI3ZDgyOGFmMjJmNTkyMTM0ZTg5MzI0ODA2MzdjMGQ=',
+        role: 'god'
+      }
+    }
+  },
   createUser: {
     error: {
       missingFields: {

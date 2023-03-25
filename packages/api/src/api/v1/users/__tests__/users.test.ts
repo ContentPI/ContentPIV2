@@ -50,6 +50,20 @@ describe('Users API', () => {
         const userData = await getUser(at)
         expect(userData?.response.data).toEqual(mockResponse.getUser.error.userWithoutData(at))
       })
+
+      it('it should validate user', async () => {
+        tracker.on
+          .select(
+            'select "id" as "id", "username" as "username", "password" as "password", "email" as "email", "role" as "role", "active" as "active" from "users" where "id" = ? and "email" = ? and "active" = ?'
+          )
+          .response([mockResponse.validateUser.data.existingUser])
+
+        const at =
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiZXlKcFpDSTZJamhsWVRaaFlqUTNMVGd6TnpjdE5HVTFOaTA0WVRnMExUY3dOMk00T0RKaU5ESmpOQ0lzSW5WelpYSnVZVzFsSWpvaVkzcGhiblJoYm5raUxDSmxiV0ZwYkNJNkltRjZZWEJsWkdsaFFHZHRZV2xzTG1OdmJTSXNJbUZqZEdsMlpTSTZkSEoxWlN3aWRHOXJaVzRpT2lKT01rWnJXVmRhYVUxNlVURmFWMFpyV2tkR2JVMXFaR3RaYWxGNlRXcENhRTU2UlROYWFrSnRUbnBuTkU5VVdYcE9hbVJxV1dwa2FrMXFTWGxhYlVsNVQxUkpNMXBFWjNsUFIwWnRUV3BLYlU1VWEzbE5WRTB3V2xSbk5VMTZTVEJQUkVFeVRYcGthazFIVVQwaUxDSnliMnhsSWpvaVoyOWtJbjA9IiwiaWF0IjoxNjc5NjQzNjI4LCJleHAiOjE2ODIyMzU2Mjh9.WU9wFWKtr0hYVzwjtv0mtTStxbSpSTxxsRggTbg-EEg'
+        const userData = await getUser(at)
+
+        expect(userData?.response.data).toEqual(mockResponse.validateUser.data.existingUser)
+      })
     })
 
     describe('POST /api/v1/users/create', () => {
