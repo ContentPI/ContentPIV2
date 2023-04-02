@@ -1,4 +1,3 @@
-import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ApolloServer } from 'apollo-server-express'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
@@ -6,16 +5,16 @@ import cors from 'cors'
 import express from 'express'
 import { applyMiddleware } from 'graphql-middleware'
 
-// APIs
-import modelsApi from './api/v1/models'
-import usersApi from './api/v1/users'
+import { makeExecutableSchema } from '@graphql-tools/schema'
 
-// Graphql
+import modelsApiV1 from './api/v1/models'
+import usersApiV1 from './api/v1/users'
+import Config from './config'
 import resolvers from './graphql/resolvers'
 import typeDefs from './graphql/types'
 
 const app = express()
-const port = 4000
+const { port, api } = Config
 
 const corsOptions = {
   origin: '*',
@@ -37,18 +36,18 @@ const schema = applyMiddleware(
 )
 
 // API
-app.use('/api/v1/models', modelsApi)
-app.use('/api/v1/users', usersApi)
+app.use('/api/v1/models', modelsApiV1)
+app.use('/api/v1/users', usersApiV1)
 
 // Apollo Server
 const apolloServer = new ApolloServer({
   schema,
   context: async ({ req }) => {
-    const apiUrl = 'http://localhost:4000'
+    const apiUrl = api?.baseUrl
     const apiVersions: Record<string, string> = {
-      v1: '/api/v1'
+      v1: `/api/${api?.version}`
     }
-    const version = req.headers['api-version'] || 'v1'
+    const version = req.headers['api-version'] || api?.version
     const apiVersion: string = apiVersions[version as string] || apiVersions.v1
 
     return {
